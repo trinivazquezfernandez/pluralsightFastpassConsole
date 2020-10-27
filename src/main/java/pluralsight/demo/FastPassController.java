@@ -1,5 +1,6 @@
 package pluralsight.demo;
 
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
@@ -22,13 +23,23 @@ public class FastPassController {
 	@Autowired
 	private RestTemplate restTemplate;
 
+	@HystrixCommand(fallbackMethod = "GetFastPassCustomerDetailsBackup")
 	@RequestMapping(path="/customerdetails", params={"fastpassid"})
 	public String getFastPassCustomerDetails(@RequestParam String fastpassid, Model m) {
 
-		FastPassCustomer c = restTemplate.getForObject("http://pluralsight-fastpass-service/fastpass?fastpassid=" + fastpassid, FastPassCustomer.class);
+		FastPassCustomer c = restTemplate.getForObject("http://pluralsight-eureka-fastpass-service/fastpass?fastpassid=" + fastpassid, FastPassCustomer.class);
 		System.out.println("retrieved customer details");
 		m.addAttribute("customer", c);
 		return "console";
+	}
+
+	public String GetFastPassCustomerDetailsBackup(@RequestParam String fastpassid, Model m){
+		System.out.println("Fallback operation called");
+		FastPassCustomer customer = new FastPassCustomer();
+		customer.setFastPassId(fastpassid);
+		m.addAttribute("customer", customer);
+		return "console";
+
 	}
 
 }
