@@ -27,7 +27,7 @@ public class FastPassController {
 	@RequestMapping(path="/customerdetails", params={"fastpassid"})
 	public String getFastPassCustomerDetails(@RequestParam String fastpassid, Model m) {
 
-		FastPassCustomer c = restTemplate.getForObject("http://pluralsight-eureka-fastpass-service/fastpass?fastpassid=" + fastpassid, FastPassCustomer.class);
+		FastPassCustomer c = restTemplate.getForObject("http://pluralsight-fastpass-service/fastpass?fastpassid=" + fastpassid, FastPassCustomer.class);
 		System.out.println("retrieved customer details");
 		m.addAttribute("customer", c);
 		return "console";
